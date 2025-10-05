@@ -1,5 +1,10 @@
 #include "usart.h"
 
+    bool usart_RxFlag=false;        //True: RX Complete
+    bool usart_RxbufferOVF=false;   //True:OverFlow
+    bool usart_errFlag =false ;     //True: Error Occur
+    char usart_Rxbuffer[Buffer_size];
+    uint8_t _bufferIndex=0; 
 void usart_Init(bool _initStatus)
 {
     if(_initStatus)
@@ -18,14 +23,20 @@ void usart_Init(bool _initStatus)
         bitSet(UCSR0C,UCSZ01);     // 8 bit size
         bitSet(UCSR0C,UCSZ00);     // 8 bit size
         bitClear(UCSR0B,UCSZ00);   // 8 bit size
+
         
         bitSet(UCSR0B,TXEN0); // Tx enable
         
         bitSet(UCSR0B,RXEN0); // Rx enable
 
+        bitSet(UCSR0B,RXCIE0); // Receive Interrupt Enable
+        bitSet(UCSR0A,U2X0); //Double Speed
+
         // Baud rate: 115200, for 16MHz clock
         UBRR0H=0;
-        UBRR0L=8;
+        UBRR0L=16;
+        usart_Flush();
+        
         
         
         
@@ -36,8 +47,8 @@ void usart_Init(bool _initStatus)
         // Tx disable
         bitClear(UCSR0B,TXEN0);
         // Clear UBRR registers
-        UBRR0L = 0;
-        UBRR0H = 0;
+         UBRR0L = 0;
+         UBRR0H = 0;
         // Clear UCSR registers
         UCSR0A = 0;
         UCSR0B = 0;
@@ -47,6 +58,31 @@ void usart_Init(bool _initStatus)
         bitClear(PORTE,1);
     }
     
+}
+
+ISR(USART0_RX_vect)
+{
+    uint8_t _RxData;
+    usart_errFlag=false;
+    usart_errFlag = usart_RxbufferOVF |usart_frameError | usart_DataOverRight ;
+
+    _RxData=UDR0;
+    if( !usart_errFlag)
+        {
+        if(_RxData=='\n')
+        {
+            usart_Rxbuffer[_bufferIndex++]='\0';
+            usart_RxFlag=true;
+        }
+        else
+        {
+            if(_RxData !='\r')
+            {
+            usart_Rxbuffer[_bufferIndex++]=_RxData;
+            if (_bufferIndex>Buffer_size) usart_RxbufferOVF=true;
+            }
+        }
+    }
 }
 
 void usart_Write(uint8_t _Data)
@@ -80,7 +116,20 @@ void usart_Putsln(char* _String)
 uint8_t usart_getChar(void)
 {
     // Wait for data to be received
-    while ( !(UCSR0A & (1<<RXC0)) );
+    while ( !bitCheck(UCSR0A,RXC0));
     // Get and return received data from buffer
     return UDR0;
+}
+
+void usart_Flush (void)
+{
+    uint8_t _index=0;
+    for (_index=Buffer_size; _index<Buffer_size; _index++)
+    {
+        usart_Rxbuffer [_index]='\0';
+    }
+    usart_RxFlag=false;
+     _bufferIndex=0; 
+    usart_RxbufferOVF=false;
+    usart_errFlag=false;
 }
