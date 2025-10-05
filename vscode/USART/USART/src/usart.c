@@ -4,8 +4,10 @@ void usart_Init(bool _initStatus)
 {
     if(_initStatus)
     {
-        bitSet(DDRE,1); // TXD0 ,   set as output
-        bitSet(PORTE,1); // TXD0 ,   set high
+        bitSet(__usart_TX_Congig,__usart_TX_Bit); // TXD0 ,   set as output
+        bitSet(__usart_TX_Control,__usart_TX_Bit); // TXD0 ,   set high
+        bitClear(__usart_RX_Congig,__usart_RX_Bit); // RXD0 ,   set as input
+        bitSet(__usart_RX_Control,__usart_RX_Bit); // RXD0 ,   set high (pull-up enabled)
 
         //Asynchronous mode, no parity, 1 stop bit, 8 bit size
         bitClear(UCSR0C,UMSEL01);  // Asynchronous mode
@@ -16,11 +18,18 @@ void usart_Init(bool _initStatus)
         bitSet(UCSR0C,UCSZ01);     // 8 bit size
         bitSet(UCSR0C,UCSZ00);     // 8 bit size
         bitClear(UCSR0B,UCSZ00);   // 8 bit size
-        // Tx enable
-        bitSet(UCSR0B,TXEN0); 
-        // Baud rate: 9600, for 16MHz clock
-        UBRR0L = 103;
-        UBRR0H = 0;
+        
+        bitSet(UCSR0B,TXEN0); // Tx enable
+        
+        bitSet(UCSR0B,RXEN0); // Rx enable
+
+        // Baud rate: 115200, for 16MHz clock
+        UBRR0H=0;
+        UBRR0L=8;
+        
+        
+        
+        
     }
     else
     {
@@ -66,4 +75,12 @@ void usart_Putsln(char* _String)
     }
     usart_Write('\r');
     usart_Write('\n');
+}
+
+uint8_t usart_getChar(void)
+{
+    // Wait for data to be received
+    while ( !(UCSR0A & (1<<RXC0)) );
+    // Get and return received data from buffer
+    return UDR0;
 }
