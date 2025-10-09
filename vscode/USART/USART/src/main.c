@@ -30,7 +30,7 @@ int main(void)
         {
             alcd_clear();
             alcd_puts("usart_errFlag");
-            usart_Flush();
+            usart_Flush();//
         }
     }
         
