@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <avr/interrupt.h>
 #include "usart.h"
+#include "adc.h"
 
 #define bitSet(_Reg, _Bit)    (_Reg |= (1<<_Bit))
 #define bitClear(_Reg, _Bit)  (_Reg &= ~(1<<_Bit))

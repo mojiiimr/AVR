@@ -3,8 +3,8 @@
 
 #include "aKaReZa.h"
 
-void adc_Init(bool initStatus);
-
+void        adc_Init   (bool initStatus);
+uint16_t    adc_Read   (uint8_t _adcChannel);
 
 
 #endif
