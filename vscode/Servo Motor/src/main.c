@@ -1,18 +1,42 @@
-#include <Arduino.h>
+#include "aKaReZa.h"
+ #define _dalay(x)  ((x*250)/100)
 
-// put function declarations here:
-int myFunction(int, int);
+ int main(void)
+ {
+      // Period Frequency = 50 Hz
+      // Period Time = 20 ms
+     /* Initialize Waveform Generation Timer0 in Phase Correct PWM Mode
+      with OCRA as TOP and prescaler 1024  */
 
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
-}
+      // Set Waveform Generation Mode to Phase Correct PWM with OCRA as TOP
+     bitSet  ( TCCR0A, WGM00);
+     bitClear( TCCR0A, WGM01);
+     bitSet  ( TCCR0B, WGM02);
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
+     // Set Prescaler to 1024
+     bitSet   (TCCR0B, CS00);
+     bitClear (TCCR0B, CS01);
+     bitSet   (TCCR0B, CS02);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
+     //Set OC0B as non-inverting mode
+     bitClear ( TCCR0A, COM0B0);
+     bitSet   ( TCCR0A, COM0B1);
+
+     //Config OC0B Pin as Output
+     GPIO_Config_OUTPUT(OC0B_Config, OC0B_Pin);
+
+      // Set OCRA for 20 ms Period Time
+      OCR0A = 250;  // TOP Value
+
+      
+
+     /* Enable global interrupts */
+     globalInt_Enable;
+
+     while (1)
+     {
+         /* Main loop code */
+     }
+
+     return 0;
+ }

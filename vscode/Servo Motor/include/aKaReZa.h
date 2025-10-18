@@ -18,8 +18,7 @@
 #include <avr/interrupt.h>
 #include <string.h>
 #include "Timer0.h"
-#include "Timer0CTC.h"
-#include "Timer1CTC.h"
+
 
 #define bitSet(_Reg, _Bit)    (_Reg |= (1<<_Bit))
 #define bitClear(_Reg, _Bit)  (_Reg &= ~(1<<_Bit))
