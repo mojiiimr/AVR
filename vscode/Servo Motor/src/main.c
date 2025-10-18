@@ -1,5 +1,5 @@
 #include "aKaReZa.h"
- #define _dalay(x)  ((x*250)/100)
+ #define _dalay(x)  ((x*156)/100) //
 
  int main(void)
  {
@@ -25,8 +25,12 @@
      //Config OC0B Pin as Output
      GPIO_Config_OUTPUT(OC0B_Config, OC0B_Pin);
 
-      // Set OCRA for 20 ms Period Time
-      OCR0A = 250;  // TOP Value
+     // Set OCRA for 20 ms Period Time (generate PWM Waveform with 50 Hz Frequency)
+     OCR0A = 156;  // TOP Value
+
+     // Set Initial Duty Cycle
+     OCR0B=_dalay(3); // 3 ms Pulse Width for 90 Degree Position
+
 
       
 
