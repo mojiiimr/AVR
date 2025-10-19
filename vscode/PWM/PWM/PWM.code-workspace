@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "PWM",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"usart.h": "c"
+		}
+	}
+}
